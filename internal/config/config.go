@@ -2,14 +2,19 @@ package config
 
 import (
 	"flag"
+	"log/slog"
 	"os"
+	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 // Config - структура конфигурации приложения
 type Config struct {
-	Env    string `yaml:"env" env-default:"local" env:"ENV"`
+	Env string `yaml:"env" env-default:"local" env:"ENV"`
+	Log struct {
+		Level string `yaml:"level" env-default:"debug" env:"LOG_LEVEL"`
+	} `yaml:"log"`
 	Server struct {
 		Host string `yaml:"host" env-default:"localhost" env:"SERVER_HOST"`
 		Port string `yaml:"port" env-default:"8080" env:"SERVER_PORT"`
@@ -18,6 +23,22 @@ type Config struct {
 		Host string `yaml:"host" env-default:"localhost" env:"GRPC_HOST"`
 		Port string `yaml:"port" env-default:"50051" env:"GRPC_PORT"`
 	} `yaml:"grpc"`
+}
+
+// ParseLogLevel преобразует строку в соответствующий slog.Level
+func ParseLogLevel(level string) slog.Level {
+	switch strings.ToLower(level) {
+	case "debug":
+		return slog.LevelDebug
+	case "info":
+		return slog.LevelInfo
+	case "warn":
+		return slog.LevelWarn
+	case "error":
+		return slog.LevelError
+	default:
+		return slog.LevelDebug
+	}
 }
 
 // fetchConfigPath - получает путь до конфигурационного файла

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/learies/go-keeper/internal/config"
+	"github.com/learies/go-keeper/internal/server/interceptors"
 )
 
 // App представляет основное приложение, содержащее gRPC сервер и конфигурацию
@@ -21,7 +22,12 @@ type App struct {
 
 // NewApp создает новый экземпляр приложения
 func NewApp(cfg *config.Config) (*App, error) {
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			interceptors.LoggingInterceptor,
+			interceptors.RecoveryInterceptor,
+		),
+	)
 
 	return &App{
 		grpcServer: grpcServer,
@@ -37,7 +43,7 @@ func (a *App) Run() error {
 	// Создаем listener для TCP соединений
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
-		return fmt.Errorf("failed to listen: %v", err)
+		return fmt.Errorf("failed to listen: %w", err)
 	}
 
 	// Создаем контекст, который будет отменен при получении SIGINT или SIGTERM
@@ -47,12 +53,12 @@ func (a *App) Run() error {
 	// Запускаем горутину для graceful shutdown
 	go func() {
 		<-ctx.Done()
-		slog.Info("Shutting down gRPC server...")
+		slog.Info("Shutting down gRPC server gracefully...")
 		a.grpcServer.GracefulStop()
 	}()
 
 	// Логируем информацию о запуске сервера
-	slog.Info("Starting gRPC server", "address", addr)
+	slog.Info("Starting gRPC server", slog.String("address", addr))
 
 	// Запускаем gRPC сервер
 	if err := a.grpcServer.Serve(lis); err != nil {
