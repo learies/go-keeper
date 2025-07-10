@@ -10,9 +10,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	authv1 "github.com/learies/go-keeper/internal/api/proto/auth/v1"
 	"github.com/learies/go-keeper/internal/config"
-	"github.com/learies/go-keeper/internal/server/interceptors"
+	"github.com/learies/go-keeper/internal/server"
 	"github.com/learies/go-keeper/internal/server/service"
 )
 
@@ -23,17 +22,9 @@ type App struct {
 }
 
 // NewApp создает новый экземпляр приложения
-func NewApp(cfg *config.Config) (*App, error) {
-	grpcServer := grpc.NewServer(
-		grpc.ChainUnaryInterceptor(
-			interceptors.LoggingInterceptor,
-			interceptors.RecoveryInterceptor,
-		),
-	)
-
-	// Регистрируем сервисы
-	authService := service.NewAuthService()
-	authv1.RegisterAuthServiceServer(grpcServer, authService)
+func New(cfg *config.Config) (*App, error) {
+	grpcServer := server.NewGRPCServer()
+	service.RegisterServices(grpcServer)
 
 	return &App{
 		grpcServer: grpcServer,

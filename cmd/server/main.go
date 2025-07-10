@@ -20,7 +20,7 @@ func main() {
 	slog.SetDefault(logger)
 
 	// Создаем новое приложение, передавая загруженную конфигурацию
-	application, err := app.NewApp(cfg)
+	application, err := app.New(cfg)
 	if err != nil {
 		slog.Error("could not create application",
 			slog.String("error", err.Error()),
