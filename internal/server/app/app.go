@@ -53,8 +53,8 @@ func (a *App) Run() error {
 	}
 
 	// Создаем контекст, который будет отменен при получении SIGINT или SIGTERM
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
 
 	// Запускаем горутину для graceful shutdown
 	go func() {
