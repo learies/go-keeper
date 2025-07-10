@@ -1,16 +1,31 @@
-APP_NAME := server
-CONFIG_FILE := configs/local.yaml
 GO_CMD := go
-RUN_CMD := $(GO_CMD) run cmd/$(APP_NAME)/main.go -config $(CONFIG_FILE)
+CONFIG_FILE := configs/local.yaml
 PROTO_FILE := internal/api/proto/auth/v1/auth.proto
 
-.PHONY: run
-run:
-	$(RUN_CMD)
+SERVER_APP_NAME := server
+CLIENT_APP_NAME := client
+
+SERVER_RUN_CMD := $(GO_CMD) run cmd/$(SERVER_APP_NAME)/main.go -config $(CONFIG_FILE)
+CLIENT_RUN_CMD := $(GO_CMD) run cmd/$(CLIENT_APP_NAME)/main.go -config $(CONFIG_FILE)
+
+.PHONY: runserver
+runserver:
+	$(SERVER_RUN_CMD)
+
+.PHONY: server
+server: runserver
+
+.PHONY: runclient
+runclient:
+	$(CLIENT_RUN_CMD)
+
+.PHONY: client
+client: runclient
+
 
 .PHONY: build
 build:
-	$(GO_CMD) build -o bin/$(APP_NAME) cmd/$(APP_NAME)/main.go
+	$(GO_CMD) build -o bin/$(SERVER_APP_NAME) cmd/$(SERVER_APP_NAME)/main.go
 
 .PHONY: clean
 clean:
