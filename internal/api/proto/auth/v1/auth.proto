@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/learies/go-keeper/internal/api/proto/auth/v1;authv1";
+
+// AuthService — сервис для проверки работы gRPC.
+service AuthService {
+  rpc Ping (PingRequest) returns (PingResponse);
+}
+
+message PingRequest {
+  string message = 1;
+}
+
+message PingResponse {
+  string response = 1;
+}
