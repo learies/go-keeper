@@ -10,8 +10,10 @@ import (
 
 	"google.golang.org/grpc"
 
+	authv1 "github.com/learies/go-keeper/internal/api/proto/auth/v1"
 	"github.com/learies/go-keeper/internal/config"
 	"github.com/learies/go-keeper/internal/server/interceptors"
+	"github.com/learies/go-keeper/internal/server/service"
 )
 
 // App представляет основное приложение, содержащее gRPC сервер и конфигурацию
@@ -28,6 +30,10 @@ func NewApp(cfg *config.Config) (*App, error) {
 			interceptors.RecoveryInterceptor,
 		),
 	)
+
+	// Регистрируем сервисы
+	authService := service.NewAuthService()
+	authv1.RegisterAuthServiceServer(grpcServer, authService)
 
 	return &App{
 		grpcServer: grpcServer,
