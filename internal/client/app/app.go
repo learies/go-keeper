@@ -3,7 +3,8 @@ package app
 import (
 	"context"
 	"log/slog"
-	"time"
+	"os/signal"
+	"syscall"
 
 	"github.com/learies/go-keeper/internal/client/service"
 	"github.com/learies/go-keeper/internal/config"
@@ -14,6 +15,7 @@ type App struct {
 	cfg        *config.Config
 }
 
+// New создает новый экземпляр приложения
 func New(cfg *config.Config) (*App, error) {
 	// Создаем gRPC клиент для сервиса аутентификации
 	authClient, err := service.NewAuthClient(cfg)
@@ -27,8 +29,10 @@ func New(cfg *config.Config) (*App, error) {
 	}, nil
 }
 
-func (a *App) Run(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+// Run запускает приложение и gRPC клиент
+func (a *App) Run() error {
+	// Создаем контекст, который будет отменен при получении SIGINT или SIGTERM
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	response, err := a.authClient.Ping(ctx, "Hello!")
