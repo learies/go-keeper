@@ -20,14 +20,16 @@ func main() {
 	slog.SetDefault(logger)
 
 	// Создаем новое приложение, передавая загруженную конфигурацию
-	app, err := app.NewApp(cfg)
+	application, err := app.NewApp(cfg)
 	if err != nil {
-		slog.Error("Could not create application", slog.Any("error", err))
+		slog.Error("could not create application",
+			slog.String("error", err.Error()),
+			slog.Any("config", cfg))
 		os.Exit(1)
 	}
 
 	// Запускаем приложение
-	if err := app.Run(); err != nil {
+	if err := application.Run(); err != nil {
 		slog.Error("Server stopped with error", slog.Any("error", err))
 		os.Exit(1)
 	}
