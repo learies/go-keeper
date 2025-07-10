@@ -16,10 +16,10 @@ type AuthClient struct {
 }
 
 func NewAuthClient(cfg *config.Config) (*AuthClient, error) {
-	address := cfg.GRPC.Host + ":" + cfg.GRPC.Port
+	addr := cfg.GRPC.Host + ":" + cfg.GRPC.Port
 
 	conn, err := grpc.NewClient(
-		address,
+		addr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
