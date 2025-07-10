@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -16,7 +17,8 @@ type AuthClient struct {
 }
 
 func NewAuthClient(cfg *config.Config) (*AuthClient, error) {
-	addr := cfg.GRPC.Host + ":" + cfg.GRPC.Port
+	// Формируем адрес для прослушивания из конфигурации
+	addr := net.JoinHostPort(cfg.GRPC.Host, cfg.GRPC.Port)
 
 	conn, err := grpc.NewClient(
 		addr,
