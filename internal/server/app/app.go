@@ -8,8 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/learies/go-keeper/internal/config"
 	"google.golang.org/grpc"
+
+	"github.com/learies/go-keeper/internal/config"
 )
 
 // App представляет основное приложение, содержащее gRPC сервер и конфигурацию
