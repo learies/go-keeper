@@ -10,3 +10,7 @@ server:
 grpc:
   host: localhost
   port: "50051"
+
+database:
+  postgres:
+    dsn: "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"

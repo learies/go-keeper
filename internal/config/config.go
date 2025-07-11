@@ -23,6 +23,11 @@ type Config struct {
 		Host string `yaml:"host" env-default:"localhost" env:"GRPC_HOST"`
 		Port string `yaml:"port" env-default:"50051" env:"GRPC_PORT"`
 	} `yaml:"grpc"`
+	Database struct {
+		Postgres struct {
+			DSN string `yaml:"dsn" env:"POSTGRES_DSN"`
+		} `yaml:"postgres"`
+	} `yaml:"database"`
 }
 
 // ParseLogLevel преобразует строку в соответствующий slog.Level

@@ -7,12 +7,35 @@ option go_package = "github.com/learies/go-keeper/internal/api/proto/auth/v1;aut
 // AuthService — сервис для проверки работы gRPC.
 service AuthService {
   rpc Ping (PingRequest) returns (PingResponse);
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Login (LoginRequest) returns (LoginResponse);
 }
 
+// Ping
 message PingRequest {
   string message = 1;
 }
 
 message PingResponse {
   string response = 1;
+}
+
+// Register
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  string user_id = 1;
+}
+
+// Login
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
 }

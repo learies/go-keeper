@@ -10,8 +10,10 @@ import (
 
 	"google.golang.org/grpc"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/learies/go-keeper/internal/config"
 	"github.com/learies/go-keeper/internal/server"
+	"github.com/learies/go-keeper/internal/server/repository"
 	"github.com/learies/go-keeper/internal/server/service"
 )
 
@@ -19,16 +21,25 @@ import (
 type App struct {
 	grpcServer *grpc.Server
 	cfg        *config.Config
+	pool       *pgxpool.Pool
 }
 
 // NewApp создает новый экземпляр приложения
 func New(cfg *config.Config) (*App, error) {
+	// Подключаемся к PostgreSQL
+	pool, err := pgxpool.New(context.Background(), cfg.Database.Postgres.DSN)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+
+	userRepo := repository.NewUserRepository(pool)
 	grpcServer := server.NewGRPCServer()
-	service.RegisterServices(grpcServer)
+	service.RegisterServices(grpcServer, userRepo)
 
 	return &App{
 		grpcServer: grpcServer,
 		cfg:        cfg,
+		pool:       pool,
 	}, nil
 }
 
@@ -51,7 +62,7 @@ func (a *App) Run() error {
 	go func() {
 		<-ctx.Done()
 		slog.Info("Shutting down gRPC server gracefully...")
-		a.grpcServer.GracefulStop()
+		a.Shutdown()
 	}()
 
 	// Логируем информацию о запуске сервера
@@ -63,4 +74,9 @@ func (a *App) Run() error {
 	}
 
 	return nil
+}
+
+func (a *App) Shutdown() {
+	a.grpcServer.GracefulStop()
+	a.pool.Close()
 }
